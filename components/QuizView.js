@@ -1,52 +1,31 @@
 import React, { useState } from "react";
-import { Text, Button, StyleSheet, View } from "react-native";
-import { green, purple } from "../utils/colors";
+import { StyleSheet, View } from "react-native";
+import { green, blue, purple, red, white } from "../utils/colors";
+import { clearLocalNotification, setLocalNotification } from "../utils/helpers";
+import Button from "./Button";
+import StyledText from "./StyledText";
 
-function QuizResults({ title, score, navigation, onReset }) {
-  const [answers, setAnswers] = useState({ correct: 0, incorrect: 0 });
-
-  return (
-    <View>
-      <Text>Score: {score * 100}%</Text>
-      <Button
-        style={{ margin: 20 }}
-        title="Restart Quiz"
-        color="green"
-        accessibilityLabel="Restart Quiz"
-        onPress={onReset}
-      />
-      <Button
-        style={{ margin: 20 }}
-        title="Back to Deck"
-        color="green"
-        accessibilityLabel="Return back to deck main page"
-        onPress={() =>
-          navigation.navigate("DeckView", {
-            deckId: title
-          })
-        }
-      />
-    </View>
-  );
-}
-
-const initialAnswersState = { correct: 0, incorrect: 0 };
+const initialAnswersState = { correct: 0, incorrect: 0, showAnswer: false };
 
 export default function QuizView(props) {
   const { questions, title } = props.route.params.deck;
   if (!questions || !questions.length)
     return (
       <View>
-        <Text>Cannot start a Quiz when the Deck is empty</Text>
+        <StyledText>Cannot start a Quiz when the Deck is empty</StyledText>
       </View>
     );
 
   const [answers, setAnswers] = useState(initialAnswersState);
+
   const answersCount = answers.correct + answers.incorrect;
   if (answersCount == questions.length) {
     const score = answers.correct / questions.length;
+    clearLocalNotification().then(setLocalNotification);
+
     return (
       <QuizResults
+        style={styles.container}
         onReset={() => setAnswers(initialAnswersState)}
         title={title}
         score={score}
@@ -57,36 +36,107 @@ export default function QuizView(props) {
 
   const currentCard = questions[answersCount];
   return (
-    <View>
-      <Text style={[styles.reset]}>{currentCard.question}</Text>
-      <Button
-        style={{ margin: 20 }}
-        title="Correct"
-        color={green}
-        accessibilityLabel="Show this question answer"
-        onPress={() => setAnswers({ ...answers, correct: answers.correct + 1 })}
-      />
-      <Button
-        style={{ margin: 20 }}
-        title="Incorrect"
-        color={purple}
-        accessibilityLabel="Show this question answer"
-        onPress={() =>
-          setAnswers({ ...answers, incorrect: answers.incorrect + 1 })
-        }
-      />
-      <Button
-        style={{ margin: 20 }}
-        title="Show Answer"
-        color="#841584"
-        accessibilityLabel="Show this question answer"
-        onPress={() => setAnswers(answers++)}
-      />
+    <View style={styles.container}>
+      <View>
+        <StyledText color={blue}>
+          Question {answersCount + 1} of {questions.length}
+        </StyledText>
+        <CardView {...currentCard} showAnswer={answers.showAnswer} />
+      </View>
+      <View style={styles.actions}>
+        <Button
+          title="Correct"
+          color={green}
+          onPress={() =>
+            setAnswers({
+              ...answers,
+              correct: answers.correct + 1,
+              showAnswer: false
+            })
+          }
+        />
+        <Button
+          title="Incorrect"
+          color={red}
+          onPress={() =>
+            setAnswers({
+              ...answers,
+              incorrect: answers.incorrect + 1,
+              showAnswer: false
+            })
+          }
+        />
+        <Button
+          title="Show Answer"
+          color="#841584"
+          onPress={() => setAnswers({ ...answers, showAnswer: true })}
+        />
+      </View>
+    </View>
+  );
+}
+
+function QuizResults({ title, score, navigation, onReset }) {
+  return (
+    <View style={styles.container}>
+      <View style={styles.quizResults}>
+        <StyledText>Score: {Math.round(score * 100)}%</StyledText>
+      </View>
+      <View style={styles.actions}>
+        <Button title="Restart Quiz" color="green" onPress={onReset} />
+        <Button
+          title="Back to Deck"
+          color={blue}
+          onPress={() =>
+            navigation.navigate("DeckView", {
+              deckId: title
+            })
+          }
+        />
+      </View>
+    </View>
+  );
+}
+
+function CardView({ question, answer, showAnswer }) {
+  return (
+    <View style={styles.card}>
+      <StyledText>{question}</StyledText>
+      {showAnswer && <StyledText>The correct answer is: {answer}</StyledText>}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "space-between"
+  },
+  card: {
+    borderRadius: 4,
+    backgroundColor: blue,
+    padding: 20,
+    textTransform: "uppercase"
+  },
+  actions: {
+    height: 150,
+    display: "flex",
+    justifyContent: "space-around"
+  },
+  quizResults: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 150,
+    width: 150,
+    height: 150,
+    backgroundColor: blue,
+    alignSelf: "center",
+    color: white,
+    fontWeight: "bold",
+    fontSize: 60
+  },
   reset: {
     textAlign: "center",
     color: purple

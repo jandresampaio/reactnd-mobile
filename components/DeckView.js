@@ -1,68 +1,54 @@
 import React, { Component } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Platform,
-  TouchableOpacity,
-  Button
-} from "react-native";
+import { View, StyleSheet, Platform, TouchableOpacity } from "react-native";
 import { connect } from "react-redux";
-import { white } from "../utils/colors";
-
+import { blue, white } from "../utils/colors";
+import Button from "./Button";
+import { DeckInfo } from "./DeckInfo";
 class DeckView extends Component {
   componentDidMount() {}
-
-  delete() {
-    const { deck, navigation } = this.props;
-  }
 
   render() {
     const { deck, navigation } = this.props;
     if (!deck) return <View>Deck was not found</View>;
     return (
       <View style={styles.container}>
-        <Text>{deck.title}</Text>
-        <Text>{deck.questions.length}</Text>
-        <Button
-          style={{ margin: 20 }}
-          onPress={() =>
-            navigation.navigate("AddCard", {
-              deckId: deck.title
-            })
-          }
-          title="Add Card"
-          color="#841584"
-          accessibilityLabel="Learn more about this purple button"
-        />
-        <Button
-          style={{ margin: 20 }}
-          onPress={() =>
-            navigation.navigate("QuizView", {
-              deck
-            })
-          }
-          title="Start Quiz"
-          color="#841584"
-          accessibilityLabel="Learn more about this purple button"
-        />
-        <Button
-          style={{ margin: 20 }}
-          title="Delete Deck"
-          color="#841584"
-          accessibilityLabel="Learn more about this purple button"
-          onPress={() => navigation.navigate("Home")}
-        />
+        <DeckInfo deck={deck}></DeckInfo>
+        <View>
+          <Button
+            onPress={() =>
+              navigation.navigate("AddCard", {
+                deckId: deck.title
+              })
+            }
+            margin={10}
+            title="Add Card"
+          />
+          <Button
+            onPress={() =>
+              navigation.navigate("QuizView", {
+                deck
+              })
+            }
+            margin={10}
+            title="Start Quiz"
+          />
+        </View>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  deck: {
+    borderRadius: 4,
+    backgroundColor: blue,
+    padding: 20,
+    textTransform: "uppercase"
+  },
   container: {
     flex: 1,
-    backgroundColor: white,
-    padding: 15
+    padding: 20,
+    justifyContent: "space-between"
   }
 });
 

@@ -1,31 +1,13 @@
 import React, { Component } from "react";
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  TextInput,
-  Platform
-} from "react-native";
+import { View, StyleSheet, TextInput } from "react-native";
 
 import { addCardToDeck } from "../utils/api";
 import { connect } from "react-redux";
-import { addCard, addDeck } from "../actions";
-import { purple, white } from "../utils/colors";
+import { addCard } from "../actions";
+import { blue } from "../utils/colors";
 import { CommonActions } from "@react-navigation/native";
+import Button from "./Button";
 
-function SubmitBtn({ onPress }) {
-  return (
-    <TouchableOpacity
-      style={
-        Platform.OS === "ios" ? styles.iosSubmitBtn : styles.AndroidSubmitBtn
-      }
-      onPress={onPress}
-    >
-      <Text style={styles.submitBtnText}>SUBMIT</Text>
-    </TouchableOpacity>
-  );
-}
 class AddCard extends Component {
   state = {
     question: "",
@@ -39,8 +21,6 @@ class AddCard extends Component {
     this.props.dispatch(addCard(title, card));
     this.props.navigation.dispatch(CommonActions.goBack());
     addCardToDeck(title, card);
-
-    //clearLocalNotification().then(setLocalNotification);
   };
 
   onChangeQuestion(question) {
@@ -55,25 +35,21 @@ class AddCard extends Component {
     const { question, answer } = this.state;
     return (
       <View style={styles.container}>
-        <TextInput
-          style={{
-            height: 40,
-            borderColor: "gray",
-            borderWidth: 1
-          }}
-          onChangeText={(text) => this.onChangeQuestion(text)}
-          value={question}
-        />
-        <TextInput
-          style={{
-            height: 40,
-            borderColor: "gray",
-            borderWidth: 1
-          }}
-          onChangeText={(text) => this.onChangeAnswer(text)}
-          value={answer}
-        />
-        <SubmitBtn style={{ marginTop: 30 }} onPress={this.submit} />
+        <View>
+          <TextInput
+            style={styles.inputText}
+            placeholder="Type the question here..."
+            onChangeText={(text) => this.onChangeQuestion(text)}
+            value={question}
+          />
+          <TextInput
+            style={styles.inputText}
+            placeholder="Type the answer here..."
+            onChangeText={(text) => this.onChangeAnswer(text)}
+            value={answer}
+          />
+        </View>
+        <Button title="Add Card" onPress={this.submit} />
       </View>
     );
   }
@@ -82,30 +58,14 @@ class AddCard extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20
+    padding: 20,
+    justifyContent: "space-between"
   },
-  iosSubmitBtn: {
-    backgroundColor: purple,
-    padding: 10,
-    borderRadius: 7,
-    height: 45,
-    marginLeft: 40,
-    marginRight: 40
-  },
-  AndroidSubmitBtn: {
-    backgroundColor: purple,
-    padding: 10,
-    paddingLeft: 30,
-    paddingRight: 30,
-    height: 45,
-    borderRadius: 2,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  submitBtnText: {
-    color: white,
-    fontSize: 22,
-    textAlign: "center"
+  inputText: {
+    marginBottom: 20,
+    height: 40,
+    borderColor: blue,
+    borderWidth: 1
   }
 });
 

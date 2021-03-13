@@ -1,31 +1,13 @@
 import React, { Component } from "react";
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  TextInput,
-  Platform
-} from "react-native";
+import { View, StyleSheet, TextInput } from "react-native";
 
 import { saveDeckTitle } from "../utils/api";
 import { connect } from "react-redux";
 import { addDeck } from "../actions";
-import { green, white } from "../utils/colors";
+import { blue } from "../utils/colors";
 import { CommonActions } from "@react-navigation/native";
+import Button from "./Button";
 
-function SubmitBtn({ onPress }) {
-  return (
-    <TouchableOpacity
-      style={
-        Platform.OS === "ios" ? styles.iosSubmitBtn : styles.AndroidSubmitBtn
-      }
-      onPress={onPress}
-    >
-      <Text style={styles.submitBtnText}>SUBMIT</Text>
-    </TouchableOpacity>
-  );
-}
 class AddDeck extends Component {
   state = {
     title: ""
@@ -39,8 +21,6 @@ class AddDeck extends Component {
     this.toDeckView(title);
 
     saveDeckTitle(title);
-
-    //clearLocalNotification().then(setLocalNotification);
   };
 
   toDeckView = (title) => {
@@ -63,15 +43,12 @@ class AddDeck extends Component {
     return (
       <View style={styles.container}>
         <TextInput
-          style={{
-            height: 40,
-            borderColor: "gray",
-            borderWidth: 1
-          }}
+          style={styles.inputText}
+          placeholder="Type the Deck name here..."
           onChangeText={(text) => this.onChangeText(text)}
           value={title}
         />
-        <SubmitBtn style={{ marginTop: 30 }} onPress={this.submit} />
+        <Button title="Add Deck" onPress={this.submit} />
       </View>
     );
   }
@@ -80,30 +57,14 @@ class AddDeck extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20
+    padding: 20,
+    justifyContent: "space-between"
   },
-  iosSubmitBtn: {
-    backgroundColor: green,
-    padding: 10,
-    borderRadius: 7,
-    height: 45,
-    marginLeft: 40,
-    marginRight: 40
-  },
-  AndroidSubmitBtn: {
-    backgroundColor: green,
-    padding: 10,
-    paddingLeft: 30,
-    paddingRight: 30,
-    height: 45,
-    borderRadius: 2,
-    justifyContent: "center",
-    alignItems: "center"
-  },
-  submitBtnText: {
-    color: white,
-    fontSize: 22,
-    textAlign: "center"
+  inputText: {
+    marginTop: 20,
+    height: 40,
+    borderColor: blue,
+    borderWidth: 1
   }
 });
 

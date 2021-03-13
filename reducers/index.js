@@ -27,7 +27,7 @@ function decks(state = {}, action) {
       return {
         ...state,
         [deckTitle]: {
-          ...[deckTitle],
+          ...state[deckTitle],
           questions: [...state[deckTitle].questions, card]
         }
       };

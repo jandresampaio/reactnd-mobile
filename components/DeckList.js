@@ -3,34 +3,17 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   StatusBar,
   FlatList,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from "react-native";
 import { connect } from "react-redux";
 import { receiveDecks } from "../actions";
 import { getDecks } from "../utils/api";
 import { blue, white } from "../utils/colors";
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: StatusBar.currentHeight || 0
-  },
-  item: {
-    backgroundColor: blue,
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16
-  },
-  itemText: {
-    color: white
-  },
-  title: {
-    fontSize: 32
-  }
-});
+import Button from "./Button";
+import { DeckInfo } from "./DeckInfo";
 
 class DeckList extends Component {
   state = {
@@ -49,11 +32,11 @@ class DeckList extends Component {
     const { ready } = this.state;
 
     if (ready === false) {
-      return "loading";
+      return <ActivityIndicator size="small" color="#0000ff" />;
     }
 
     const renderItem = ({ item }) => (
-      <View style={styles.item}>
+      <View>
         <TouchableOpacity
           key={item.title}
           onPress={() =>
@@ -62,32 +45,45 @@ class DeckList extends Component {
             })
           }
         >
-          <View>
-            <Text style={styles.itemText}>{item.title}</Text>
-            <Text style={styles.itemText}>{item.questions.length} cards</Text>
-          </View>
+          <DeckInfo deck={item}></DeckInfo>
         </TouchableOpacity>
       </View>
     );
 
     return (
-      <View>
+      <View style={styles.container}>
         <FlatList
           data={Object.values(decks)}
           renderItem={renderItem}
           keyExtractor={(item) => item.title}
         />
         <Button
-          style={{ margin: 20 }}
           title="Add Deck"
-          color="green"
-          accessibilityLabel="Learn more about this purple button"
+          color="#1c1748"
           onPress={() => navigation.navigate("AddDeck")}
         />
       </View>
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    marginTop: StatusBar.currentHeight || 0
+  },
+
+  itemText: {
+    color: white
+  },
+  itemTitle: {
+    textTransform: "uppercase"
+  },
+  title: {
+    fontSize: 32
+  }
+});
 
 function mapStateToProps(decks) {
   return {
